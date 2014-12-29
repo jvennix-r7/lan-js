@@ -431,8 +431,8 @@ var CSSProbe = function(opts) {
 CSSProbe.POLL_INTERVAL = 10;
 
 /*
- * JSGlobalProbe checks if the target address responds with valid javascript
- * that adds some known variables to the global scope. It works by creating a
+ * JSProbe checks if the target address responds with valid javascript
+ * that causes some expression to evaluate to `true`. It works by creating a
  * new <iframe> and loading the xdomain <script> into the frame, then checking
  * the frame's window object for the new vars.
  *
@@ -440,7 +440,7 @@ CSSProbe.POLL_INTERVAL = 10;
  * @options opts [String] url the url to the script
  * @options opts [String] global the JS global to check for
  */
-var JSGlobalProbe = function(opts) {
+var JSProbe = function(opts) {
   var _frame = null;
   var _this  = this;
   _frame = lan.utils.create_iframe();
@@ -455,8 +455,10 @@ var JSGlobalProbe = function(opts) {
 
     script.onload = function() {
       var found = true;
-      if (opts.global) {
-        if (typeof _frame.contentWindow[opts.global] === 'undefined') {
+      if (opts.expression) {
+        /*jshint -W061 */
+        if (_frame.contentWindow.eval(opts.expression)) {
+        /*jshint +W061 */
           found = false;
         }
       }
@@ -483,9 +485,9 @@ var JSGlobalProbe = function(opts) {
 };
 
 /*
- * JSGlobalProbe constants
+ * JSProbe constants
  */
-JSGlobalProbe.POLL_INTERVAL = 10;
+JSProbe.POLL_INTERVAL = 10;
 
 /*
  * A Fingerprint represents a single device check
@@ -528,7 +530,7 @@ var DeviceFingerprint = function(type, device, fingerprint) {
 DeviceFingerprint.PROBES = {
   image: ImageProbe,
   css:   CSSProbe,
-  js:    JSGlobalProbe
+  js:    JSProbe
 };
 
 DeviceFingerprint.db = [];

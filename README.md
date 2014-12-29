@@ -55,7 +55,7 @@ A fingerprint is a set of criteria for matching a device. There are three types 
     {
       type: 'js',
       url: '/script.js',
-      global: '$'
+      expression: 'LINKSYS_VERSION === 1'
     }
 
 #### Development environment:
