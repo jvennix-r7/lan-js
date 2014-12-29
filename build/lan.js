@@ -454,19 +454,17 @@ var JSGlobalProbe = function(opts) {
     script.setAttribute('type', 'text/javascript');
 
     script.onload = function() {
+      var found = true;
       if (opts.global) {
-        if (_frame.contentWindow[opts.global]) {
-          if (callback) callback(true, this);
-        } else {
-          if (callback) callback(false, this);
+        if (typeof _frame.contentWindow[opts.global] === 'undefined') {
+          found = false;
         }
-      } else {
-        if (callback) callback(true, this);
       }
+      if (callback) callback(found, _this);
       _this.cleanup();
     };
     script.onerror = function() {
-      if (callback) callback(false, this);
+      if (callback) callback(false, _this);
       _this.cleanup();
     };
 
