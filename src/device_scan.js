@@ -137,11 +137,50 @@ CSSProbe.POLL_INTERVAL = 10;
  * the frame's window object for the new vars.
  *
  * @param [Object] opts the options object
- * @options opts [String] url the url to the image
+ * @options opts [String] url the url to the script
+ * @options opts [String] global the JS global to check for
  */
 var JSGlobalProbe = function(opts) {
-  // private variables
+  var _frame = null;
+  var _this  = this;
+  _frame = lan.utils.create_iframe();
+
+  /*
+   * Requests the script in an <iframe>, then checks expected styles
+   * @param [Function(statusBool, probe)] callback
+   */
   this.fire = function(callback) {
+    var script = document.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+
+    script.onload = function() {
+      if (opts.global) {
+        if (_frame.contentWindow[opts.global]) {
+          if (callback) callback(true, this);
+        } else {
+          if (callback) callback(false, this);
+        }
+      } else {
+        if (callback) callback(true, this);
+      }
+      _this.cleanup();
+    };
+    script.onerror = function() {
+      if (callback) callback(false, this);
+      _this.cleanup();
+    };
+
+    script.setAttribute('src', opts.url);
+    _frame.contentDocument.body.appendChild(script);
+  };
+
+
+  // removes DOM elements, intervals, and fn refs, aborting the request immediately
+  this.cleanup = function() {
+    if (_frame) {
+      if (_frame.parentNode) { _frame.parentNode.removeChild(_frame); }
+      _frame = null;
+    }
   };
 };
 
