@@ -34,31 +34,29 @@ The `DeviceScan` class is in charge of scanning for responsive hosts and then lo
 
 A fingerprint is a set of criteria for matching a device. There are three types of fingerprints: images, scripts, and stylesheets.
   
-  // image fingerprint
-  {
-    type: 'image',
-    url: '/epsonlogo.gif',
-    width: 79,
-    height: 28
-  }
+    // image fingerprint
+    {
+      type: 'image',
+      url: '/epsonlogo.gif',
+      width: 79,
+      height: 28
+    }
 
-  // style
-  {
-    type: 'css',
-    url: '/style.css',
-    html: '<html><div id="x"></div></html>',
-    id: 'x',
-    styles: { color: 'red' }
-  }
+    // style
+    {
+      type: 'css',
+      url: '/style.css',
+      html: '<html><div id="x"></div></html>',
+      id: 'x',
+      styles: { color: 'red' }
+    }
 
-  // script
-  {
-    type: 'js',
-    url: '/script.js',
-    global: '$'
-  }
-
-
+    // script
+    {
+      type: 'js',
+      url: '/script.js',
+      global: '$'
+    }
 
 #### Development environment:
 
