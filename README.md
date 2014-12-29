@@ -1,22 +1,22 @@
 ## lan.js
 
-Some experiments with probing LAN devices from javascript.
+Some experiments with probing LAN devices from a web browser.
 
 #### Classes:
 
 - lan.TcpProbe: sends a single request out to a LAN address
-- lan.TcpScan: scans an array of addresses with TcpProbes
-- lan.DeviceFingerprint: correlates an http probe 
+- lan.TcpScan: scans an array of addresses with TcpProbes (using WebSockets with an <img> fallback)
+- lan.DeviceFingerprint: correlates a device to an image, stylesheet, or script-based fingerprint
 - lan.DeviceScan: scans an array of addresses for known DeviceFingerprints
 
 #### Sample code:
 
-Scan all the devices on your network, and print any device matches
+Scan the following devices on your network, and print any device matches
 
 ```
 lan.DeviceScan.start(['192.168.0.1', '192.168.0.2', '192.168.1.1', '10.0.0.1'], {
   found: function(address, fingerprint) {
-    console.log("["+address+"] Found device: "+fingerprint.device);
+    console.log("["+address+"] Found device: "+fingerprint);
   },
   complete: function(results) {
     console.log("Scan complete.")
