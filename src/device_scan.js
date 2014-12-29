@@ -220,6 +220,8 @@ var DeviceScan = function(addresses) {
    * @param [Object] opts the options object
    * @option opts [Function(address, device)] found called when a device is successfully fingerprinted
    * @option opts [Function(address, device)] failed called when a device fails a fingerprint
+   * @option opts [Function(address, state, deltat)] hostup called when a host is discovered up
+   * @option opts [Function(address, state, deltat)] hostdown called when a host is not responsive
    * @option opts [Function(results)] complete called when the scan is over
    */
   this.start = function(opts) {
@@ -228,6 +230,9 @@ var DeviceScan = function(addresses) {
     scan.start({
       stream: function(address, state, deltat) {
         if (state == 'up') {
+          if (opts.hostup) {
+            opts.hostup(address, state, deltat);
+          }
           // try every probe in the database
           lan.utils.each(DeviceFingerprint.db, function(fingerprint, i) {
             fingerprint.check({base: 'http://'+address }, function(probeState) {
@@ -238,6 +243,10 @@ var DeviceScan = function(addresses) {
               }
             });
           });
+        } else {
+          if (opts.hostdown) {
+            opts.hostdown(address, state, deltat);
+          }
         }
       },
       complete: function(results) {
