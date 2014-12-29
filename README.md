@@ -1,6 +1,7 @@
-## lan.js
+lan.js [![Build Status](https://travis-ci.org/jvennix-r7/lan-js.svg?branch=master)](https://travis-ci.org/jvennix-r7/lan-js)
+===
 
-Some experiments with probing LAN devices from a web browser.
+Probe LAN devices from a web browser.
 
 #### Classes:
 

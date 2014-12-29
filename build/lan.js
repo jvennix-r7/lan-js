@@ -475,6 +475,7 @@ var DeviceFingerprint = function(type, device, fingerprint) {
     }
   };
 
+  
   /*
    * Patch toString() for a nice debug display
    * @return [String] serialized representation
@@ -518,6 +519,7 @@ var DeviceScan = function(addresses) {
    * - At the end of the scan, the :complete callback is invoked
    * @param [Object] opts the options object
    * @option opts [Function(address, device)] found called when a device is successfully fingerprinted
+   * @option opts [Function(address, device)] failed called when a device fails a fingerprint
    * @option opts [Function(results)] complete called when the scan is over
    */
   this.start = function(opts) {
@@ -529,8 +531,10 @@ var DeviceScan = function(addresses) {
           // try every probe in the database
           lan.utils.each(DeviceFingerprint.db, function(fingerprint, i) {
             fingerprint.check({base: 'http://'+address }, function(probeState) {
-              if (probeState) {
-                console.log(fingerprint);
+              if (probeState && opts.found) {
+                opts.found(address, fingerprint);
+              } else if (!probeState && opts.failed) {
+                opts.failed(address, fingerprint);
               }
             });
           });
