@@ -149,16 +149,18 @@ var TcpScan = function(addresses) {
   // @option opts [Function(results)] complete gets called at end of scan
   // @option opts [Function(address, state, deltat)] stream gets called on every result
   this.start = function(opts) {
+    opts = opts || {};
+
     // run in batches
-    var i;
     var batch_idx = 0;
     var start_time = new Date();
 
     // sends the probes
-    var sendProbe = (function(i) { 
+    var sendProbe = function(i) { 
       var addr_idx = batch_idx * BATCH_SIZE + i;
       if (addr_idx >= addresses.length) return;
       var addr = addresses[addr_idx];
+      var bidx = batch_idx; // local closure
       setTimeout(function() {
         var probe = new TcpProbe(addr);
         probe.fire(function(state, duration) {
@@ -171,19 +173,32 @@ var TcpScan = function(addresses) {
             }
           }
         });
-      }, batch_idx * BATCH_DELAY);
-    })(i);
+      }, bidx * BATCH_DELAY);
+    };
 
     // run the loop
     while (batch_idx * BATCH_SIZE < addresses.length) {
-      for (i = 0; i < BATCH_SIZE; i++) {
-        sendProbe(i);
+      for (var k = 0; k < BATCH_SIZE; k++) {
+        sendProbe(k);
       }
       batch_idx++;
     }
   };
 };
 
+/*
+ * TcpScan static methods
+ */
+
+/*
+ * @param [Array<String>] addresses IPs/hostnames (no ports!) to scan
+ * @param [Object] opts the options hash
+ * @option opts [Function(resultsObject)] complete the complete callback (called once at end)
+ * @option opts [Function(singleResult)] stream the update callback (called on every check)
+ */
+TcpScan.start = function(addresses, opts) {
+  new TcpScan(addresses).start(opts);
+}
 
 // // DEBUG CODE: how to invoke the TcpScan class
 // new TcpScan(['192.168.1.1:80', '192.168.1.1:8080']).start({

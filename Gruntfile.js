@@ -4,8 +4,11 @@ module.exports = function(grunt) {
   var SRC_FILES = [
     'src/utils.js',
     'src/tcp_scan.js',
+    'src/db.js',
     'src/device_scan.js'
   ];
+
+  grunt.loadNpmTasks('grunt-contrib-compress');
 
   // Project configuration.
   grunt.initConfig({
@@ -23,6 +26,7 @@ module.exports = function(grunt) {
       options: {
         compress: true,
         mangle: true,
+        report: 'gzip',
         banner: '/*! <%= pkg.name %>@<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
@@ -46,6 +50,16 @@ module.exports = function(grunt) {
           spawn: false,
         }
       }
+    },
+    compress: {
+      main: {
+        options: {
+          mode: 'gzip'
+        },
+        files: [
+          {expand: true, src: 'build/lan.min.js', ext: '.min.js.gz'}
+        ]
+      }
     }
   });
 
@@ -54,5 +68,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify', 'compress']);
 };

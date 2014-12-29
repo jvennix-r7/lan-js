@@ -6,6 +6,7 @@
 // really hard to live without this
 var merge = function(_this, hash) {
   for (var k in hash) { _this[k] = hash[k]; }
+  return _this;
 };
 
 // normalize #forEach() implementation, for my sanity.

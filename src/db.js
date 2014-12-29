@@ -14,7 +14,6 @@ this.lan.db = this.lan.db || {};
 // Most of this database came from the jslanscanner project (https://code.google.com/p/jslanscanner).
 // Big thanks to Gareth Heyes (thespanner.co.uk) for creating the database
 // and allowing me to relicense it under MIT.
-
 // I'm still deciding what to do with this exactly.
 
 this.lan.db.devices = [
@@ -45,11 +44,6 @@ this.lan.db.devices = [
         url: '/epsonlogo.gif',
         width: 79,
         height: 28
-      }, {
-        type: 'image',
-        url: '/sig_u.gif',
-        width: 30,
-        height: 80
       }
     ]
   }, {
@@ -746,11 +740,6 @@ this.lan.db.devices = [
         url: '/logo_new.gif',
         width: 176,
         height: 125
-      }, {
-        type: 'image',
-        url: '/title.gif',
-        width: 100,
-        height: 88
       }
     ]
   }, {

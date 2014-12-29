@@ -13,6 +13,7 @@
  *
  * @param [Object] opts the options object
  * @options opts [String] url the url to the image
+ * @options opts [String] base the base url, defaults to null for relative path
  * @options opts [Number] width the expected width of the image
  * @options opts [Number] height the expected height of the image
  */
@@ -22,24 +23,33 @@ var ImageProbe = function(opts) {
   _img.setAttribute('style', lan.utils.constants.HIDDEN_STYLE);
   document.body.appendChild(_img);
 
+  var _url = opts.url;
+  if (opts.base) {
+    _url = opts.base + _url;
+  }
+
   /*
    * Sends the request for the image, then checks expected dimensions (if specified)
    * @param [Function(statusBool, probe)] callback
    */
   this.fire = function(callback) {
-    _img.onerror = _img.onload = function() {
+    _img.onload = function() {
       if (opts.width || opts.height) { // user specified explicit dimensions
         // ensure width/height match expected dimensions
         callback((!opts.width  || _img.width  === opts.width) &&
                  (!opts.height || _img.height === opts.height), _this);
       } else {
         // just make sure *something* loaded.
-        callback((_img.width > 0 && _img.height > 0), _this);
+        callback(true, _this);
       }
       // cleanup after ourselves
       _this.cleanup();
     };
-    _img.src = opts.url; // fire the request!
+    _img.onerror = function() {
+      callback(false, _this);
+      _this.cleanup();
+    }
+    _img.src = _url; // fire the request!
   };
 
   // removes DOM elements and events, aborting the request immediately
@@ -131,9 +141,6 @@ CSSProbe.POLL_INTERVAL = 10;
  */
 var JSGlobalProbe = function(opts) {
   // private variables
-  var _this = this;  // used to bind methods
-
-
   this.fire = function(callback) {
   };
 };
@@ -146,20 +153,25 @@ JSGlobalProbe.POLL_INTERVAL = 10;
 /*
  * A Fingerprint represents a single device check
  * @param [String] type img|css|js
+ * @param [Hash] device the device information
  */
-var DeviceFingerprint = function(type, data) {
+var DeviceFingerprint = function(type, device, fingerprint) {
+  lan.utils.merge(this, fingerprint);
+  lan.utils.merge(this, device);
+
   /*
    * Starts the Fingerprint request
+   * @param [String] base the https:// or http:// base URL
    * @param [Function(statusBoolean)] callback
    */
-  this.check = function(callback) {
+  this.check = function(opts, callback) {
     var Probe = this.constructor.PROBES[type];
     if (!Probe) {
       if (callback) callback(false);
       console.log("Error: invalid type '"+(type||'')+"'");
       return false;
     } else {
-      new Probe(data).fire(callback);
+      new Probe(lan.utils.merge(fingerprint, { base: opts.base })).fire(callback);
     }
   };
 };
@@ -168,12 +180,19 @@ var DeviceFingerprint = function(type, data) {
  * Fingerprint static constants and variables
  */
 DeviceFingerprint.PROBES = {
-  'image': ImageProbe,
-  'css': CSSProbe,
-  'js': JSGlobalProbe
+  image: ImageProbe,
+  css:   CSSProbe,
+  js:    JSGlobalProbe
 };
 
 DeviceFingerprint.db = [];
+if (lan.db && lan.db.devices) {
+  lan.utils.each(lan.db.devices, function(device) {
+    lan.utils.each(device.fingerprints, function(fingerprint) {
+      DeviceFingerprint.db.push(new DeviceFingerprint(fingerprint.type, device, fingerprint));
+    });
+  });
+}
 
 /*
  * DeviceScan constructor
@@ -190,21 +209,21 @@ var DeviceScan = function(addresses) {
    * - Everytime a device is found, the :found callback is invoked
    * - At the end of the scan, the :complete callback is invoked
    * @param [Object] opts the options object
-   * @option opts [Function(result)] found called when a device is successfully fingerprinted
+   * @option opts [Function(address, device)] found called when a device is successfully fingerprinted
    * @option opts [Function(results)] complete called when the scan is over
    */
   this.start = function(opts) {
+    opts = opts || {};
     var scan = new lan.TcpScan(addresses);
     scan.start({
       stream: function(address, state, deltat) {
-        if (state) {
+        if (state == 'up') {
           // try every probe in the database
-          // FIXME: match the address to known default IPs
           lan.utils.each(DeviceFingerprint.db, function(fingerprint, i) {
-            fingerprint.check(function(probeState) {
+            fingerprint.check({base: 'http://'+address }, function(probeState) {
               if (probeState) {
-                if (opts.found) opts.found(address, fingerprint);
-              } 
+                console.log(fingerprint);
+              }
             });
           });
         }
