@@ -198,7 +198,7 @@ var TcpScan = function(addresses) {
  */
 TcpScan.start = function(addresses, opts) {
   new TcpScan(addresses).start(opts);
-}
+};
 
 // // DEBUG CODE: how to invoke the TcpScan class
 // new TcpScan(['192.168.1.1:80', '192.168.1.1:8080']).start({

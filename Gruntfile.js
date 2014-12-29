@@ -4,7 +4,6 @@ module.exports = function(grunt) {
   var SRC_FILES = [
     'src/utils.js',
     'src/tcp_scan.js',
-    'src/db.js',
     'src/device_scan.js'
   ];
 
