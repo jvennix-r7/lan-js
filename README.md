@@ -58,9 +58,9 @@ A fingerprint is a set of criteria for matching a device. There are three types 
 1. First install [node](http://nodejs.org/).
 2. Install the grunt plugin and run `npm install` in the project root:
 
-    $ sudo npm i -g grunt-cli
-    $ cd ~/Projects/lan.js/
-    $ npm install
+        $ sudo npm i -g grunt-cli
+        $ cd ~/Projects/lan.js/
+        $ npm install
 
 #### Compiling
 
