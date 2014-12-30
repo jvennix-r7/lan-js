@@ -34,9 +34,9 @@ describe("lan.HostProbe", function() {
 
         it("should send a WebSockets request", function() {
           var probe = new lan.HostProbe('192.168.0.1:8080');
-          spyOn(probe, '_send_websocket_request');
+          spyOn(probe, '_sendWebSocketRequest');
           probe.fire();
-          expect(probe._send_websocket_request).toHaveBeenCalled();
+          expect(probe._sendWebSocketRequest).toHaveBeenCalled();
         });
       });
 
@@ -45,9 +45,9 @@ describe("lan.HostProbe", function() {
 
         it("should fallback to sending an image request", function() {
           var probe = new lan.HostProbe('192.168.0.1:21');
-          spyOn(probe, '_send_img_request');
+          spyOn(probe, '_sendImgRequest');
           probe.fire();
-          expect(probe._send_img_request).toHaveBeenCalled();
+          expect(probe._sendImgRequest).toHaveBeenCalled();
         });
       });
     });
@@ -61,9 +61,9 @@ describe("lan.HostProbe", function() {
 
       it("should fallback to sending an image request", function() {
         var probe = new lan.HostProbe('192.168.0.1:21');
-        spyOn(probe, '_send_img_request');
+        spyOn(probe, '_sendImgRequest');
         probe.fire();
-        expect(probe._send_img_request).toHaveBeenCalled();
+        expect(probe._sendImgRequest).toHaveBeenCalled();
       });
     });
 

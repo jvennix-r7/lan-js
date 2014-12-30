@@ -1,5 +1,6 @@
 /*
- * scan.js implements a TCP port timing scanner for LAN discovery.
+ * host_scan.js implements a HTTP timing scanner for LAN discovery.
+ *
  * By analyzing timing responses, it is possible to get an idea of the
  * overall network layout.
  *
@@ -52,10 +53,10 @@ var HostProbe = function(address) {
     var matches = address.match(/\:(\d+)$/) || ['', '80'];
     var port = parseInt(matches[1], 10);
     // feature detect and run
-    if ('WebSocket' in window && !this._illegal_ws_port(port)) {
-      this._send_websocket_request(callback);
+    if ('WebSocket' in window && !this._illegalWebSocketPort(port)) {
+      this._sendWebSocketRequest(callback);
     } else {
-      this._send_img_request(callback);
+      this._sendImgRequest(callback);
     }
   };
 
@@ -63,7 +64,7 @@ var HostProbe = function(address) {
    * @param [Number] port the port to check
    * @return [Boolean] websockets spec disallows connection on port
    */
-  this._illegal_ws_port = function(port) {
+  this._illegalWebSocketPort = function(port) {
     return WS_BLOCKED_PORTS_OBJ[''+port] || false;
   };
 
@@ -72,9 +73,9 @@ var HostProbe = function(address) {
    * latency after sending to determine if the service is up.
    * WebSockets are a bit sneakier, since http basic auth will not trigger a popup
    */
-  this._send_websocket_request = function(callback) {
+  this._sendWebSocketRequest = function(callback) {
     // create the websocket and remember when we started
-    var start_time = new Date();
+    var startTime = new Date();
     try {
       var socket = new WebSocket('ws://'+address);
     } catch (sec_exception) {
@@ -83,7 +84,7 @@ var HostProbe = function(address) {
     }
     // called at a fast interval
     var check_socket = function() {
-      var delta = (new Date()) - start_time;
+      var delta = (new Date()) - startTime;
       // check if the port has timed out
       if (delta > HostProbe.TIMEOUT) {
         if (callback) callback('timeout', delta);
@@ -99,12 +100,12 @@ var HostProbe = function(address) {
   };
 
   // Image scan simply sets an <img> src to the address, and waits for a response.
-  this._send_img_request = function(callback) {
+  this._sendImgRequest = function(callback) {
     // create the image object and attempt to load from #src
     var clearme = null; // for holding a timeout ref
-    var start_time = new Date();
+    var startTime = new Date();
     var img = new Image();
-    var delta = function() { return (new Date()) - start_time; };
+    var delta = function() { return (new Date()) - startTime; };
 
     var completed = function() {
       if (img) {
@@ -152,15 +153,15 @@ var HostScan = function(addresses) {
     opts = opts || {};
 
     // run in batches
-    var batch_idx = 0;
-    var start_time = new Date();
+    var batchIdx = 0;
+    var startTime = new Date();
 
     // sends the probes
     var sendProbe = function(i) { 
-      var addr_idx = batch_idx * BATCH_SIZE + i;
-      if (addr_idx >= addresses.length) return;
-      var addr = addresses[addr_idx];
-      var bidx = batch_idx; // local closure
+      var addrIdx = batchIdx * BATCH_SIZE + i;
+      if (addrIdx >= addresses.length) return;
+      var addr = addresses[addrIdx];
+      var bidx = batchIdx; // local closure
       setTimeout(function() {
         var probe = new HostProbe(addr);
         probe.fire(function(state, duration) {
@@ -168,7 +169,7 @@ var HostScan = function(addresses) {
           responses.push({ address: addr, state: state, duration: duration });
           if (responses.length >= addresses.length) {
             if (opts.complete) {
-              opts.complete(responses, (new Date())-start_time);
+              opts.complete(responses, (new Date())-startTime);
               opts.complete = null; // don't call this again :)
             }
           }
@@ -177,11 +178,11 @@ var HostScan = function(addresses) {
     };
 
     // run the loop
-    while (batch_idx * BATCH_SIZE < addresses.length) {
+    while (batchIdx * BATCH_SIZE < addresses.length) {
       for (var k = 0; k < BATCH_SIZE; k++) {
         sendProbe(k);
       }
-      batch_idx++;
+      batchIdx++;
     }
   };
 };
