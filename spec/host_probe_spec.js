@@ -1,12 +1,12 @@
-describe("lan.TcpProbe", function() {
-  var subject = new lan.TcpProbe('192.168.0.1');
+describe("lan.HostProbe", function() {
+  var subject = new lan.HostProbe('192.168.0.1');
 
   it("should be defined", function() {
-    expect(lan.TcpProbe).toBeDefined();
+    expect(lan.HostProbe).toBeDefined();
   });
 
   it("should throw an exception when created with no addresses", function() {
-    expect(function() { new lan.TcpProbe(); }).toThrow();
+    expect(function() { new lan.HostProbe(); }).toThrow();
   });
 
   describe("fire(callback)", function() {
@@ -14,14 +14,14 @@ describe("lan.TcpProbe", function() {
     // ensures that the callback parameter eventually is called
     var call_check = function() {
       var opts = { callback: function(){} };
-      var probe = new lan.TcpProbe('127.0.0.1:9999');
+      var probe = new lan.HostProbe('127.0.0.1:9999');
       var ran = false;
       runs(function() {
         probe.fire(function() { ran = true; });
       });
       waitsFor(function() {
         return ran;
-      }, lan.TcpProbe.TIMEOUT+1);
+      }, lan.HostProbe.TIMEOUT+1);
     };
 
     it("should eventually call the callback parameter", call_check);
@@ -33,7 +33,7 @@ describe("lan.TcpProbe", function() {
         it("should eventually call the callback parameter", call_check);
 
         it("should send a WebSockets request", function() {
-          var probe = new lan.TcpProbe('192.168.0.1:8080');
+          var probe = new lan.HostProbe('192.168.0.1:8080');
           spyOn(probe, '_send_websocket_request');
           probe.fire();
           expect(probe._send_websocket_request).toHaveBeenCalled();
@@ -44,7 +44,7 @@ describe("lan.TcpProbe", function() {
         it("should eventually call the callback parameter", call_check);
 
         it("should fallback to sending an image request", function() {
-          var probe = new lan.TcpProbe('192.168.0.1:21');
+          var probe = new lan.HostProbe('192.168.0.1:21');
           spyOn(probe, '_send_img_request');
           probe.fire();
           expect(probe._send_img_request).toHaveBeenCalled();
@@ -60,13 +60,12 @@ describe("lan.TcpProbe", function() {
       it("should eventually call the callback parameter", call_check);
 
       it("should fallback to sending an image request", function() {
-        var probe = new lan.TcpProbe('192.168.0.1:21');
+        var probe = new lan.HostProbe('192.168.0.1:21');
         spyOn(probe, '_send_img_request');
         probe.fire();
         expect(probe._send_img_request).toHaveBeenCalled();
       });
     });
 
-    // describe 
   });
 });

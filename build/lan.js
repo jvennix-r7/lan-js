@@ -187,11 +187,11 @@ var TcpProbe = function(address) {
 TcpProbe.TIMEOUT = 2000; // 2s
 
 /*
- * TcpScan constructor function
+ * HostScan constructor function
  * @param [Array<String>, String] addresses the host:port(s) to scan
  */
-var TcpScan = function(addresses) {
-  if (!addresses) throw "TcpScan requests addresses param.";
+var HostScan = function(addresses) {
+  if (!addresses) throw "HostScan requests addresses param.";
   if (addresses.constructor != Array) addresses = [addresses];
   var responses = []; // used to build responses parameter for 'complete' callback to #start
 
@@ -238,7 +238,7 @@ var TcpScan = function(addresses) {
 };
 
 /*
- * TcpScan static methods
+ * HostScan static methods
  */
 
 /*
@@ -247,12 +247,12 @@ var TcpScan = function(addresses) {
  * @option opts [Function(resultsObject)] complete the complete callback (called once at end)
  * @option opts [Function(singleResult)] stream the update callback (called on every check)
  */
-TcpScan.start = function(addresses, opts) {
-  new TcpScan(addresses).start(opts);
+HostScan.start = function(addresses, opts) {
+  new HostScan(addresses).start(opts);
 };
 
-// // DEBUG CODE: how to invoke the TcpScan class
-// new TcpScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
+// // DEBUG CODE: how to invoke the HostScan class
+// new HostScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
 //   complete: function(responses, duration) {
 //     console.log('complete callback: '+duration);
 //     var results = {};
@@ -273,7 +273,7 @@ TcpScan.start = function(addresses, opts) {
 //   var addrs = []; // holds ip:port strings
 //   while (start <= end) addrs.push(ip+':'+start++);
 
-//   new TcpScan(addrs).start({
+//   new HostScan(addrs).start({
 //     complete: function(responses, duration) {
 //       console.log('complete callback: '+duration);
 //       var results = {};
@@ -292,8 +292,8 @@ TcpScan.start = function(addresses, opts) {
 
 // exports
 lan.utils.merge(lan, {
-  TcpScan: TcpScan,
-  TcpProbe: TcpProbe
+  HostScan: HostScan,
+  HostProbe: TcpProbe
 });
 
 }).call(window);
@@ -565,7 +565,7 @@ var DeviceScan = function(addresses) {
    */
   this.start = function(opts) {
     opts = opts || {};
-    var scan = new lan.TcpScan(addresses);
+    var scan = new lan.HostScan(addresses);
     scan.start({
       stream: function(address, state, deltat) {
         if (state == 'up') {

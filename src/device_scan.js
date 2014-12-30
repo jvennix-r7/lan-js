@@ -265,7 +265,7 @@ var DeviceScan = function(addresses) {
    */
   this.start = function(opts) {
     opts = opts || {};
-    var scan = new lan.TcpScan(addresses);
+    var scan = new lan.HostScan(addresses);
     scan.start({
       stream: function(address, state, deltat) {
         if (state == 'up') {

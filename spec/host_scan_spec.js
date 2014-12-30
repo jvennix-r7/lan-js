@@ -1,0 +1,3 @@
+describe("lan.HostScan", function() {
+
+});

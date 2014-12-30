@@ -1,3 +1,0 @@
-describe("lan.TcpScan", function() {
-
-});

@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   // They will be concatenated in order, so make sure dependencies match position.
   var SRC_FILES = [
     'src/utils.js',
-    'src/tcp_scan.js',
+    'src/host_scan.js',
     'src/device_scan.js'
   ];
 
