@@ -1,6 +1,8 @@
 {
-  "name": "lan.js",
-  "version": "0.0.1",
+  "name": "lan-js",
+  "version": "0.2.0",
+  "description": "Probe LAN devices from a web browser.",
+  "author": "Joe Vennix",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.3",
@@ -13,5 +15,13 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/grunt"
+  },
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jvennix-r7/lan-js"
+  },
+  "bugs": {
+    "url": "https://github.com/jvennix-r7/lan-js/issues"
   }
 }

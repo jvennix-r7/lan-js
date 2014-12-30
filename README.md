@@ -81,3 +81,11 @@ This project includes a number of specs. To run them, simply:
 To have grunt "watch" your filesystem and run specs on change, do:
 
     grunt spec:watch
+
+#### License
+
+`lan-js` is released under the [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+
+#### Copyright
+
+2006-2014, Rapid7, Inc.
