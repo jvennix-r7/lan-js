@@ -27,7 +27,7 @@ var constants = {
  * @option opts [String] url the url to point the iframe to. defaults to about:blank.
  * @option opts [Boolean] insert insert into DOM. defaults to false.
  */
-var create_iframe = function(opts) {
+var createIframe = function(opts) {
   opts = opts || {};
   var url = opts.url || 'about:blank';
   var iframe = document.createElement('iframe');
@@ -42,7 +42,7 @@ var create_iframe = function(opts) {
  */
 this.lan = this.lan || {};
 this.lan.utils = {
-  create_iframe: create_iframe,
+  createIframe: createIframe,
   constants: constants,
   merge: merge,
   each: each

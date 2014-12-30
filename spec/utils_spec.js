@@ -36,14 +36,14 @@ describe("lan.utils", function() {
     });
   });
 
-  describe("lan.utils.create_iframe()", function() {
+  describe("lan.utils.createIframe()", function() {
     it("should return an iframe", function() {
-      var frame = lan.utils.create_iframe();
+      var frame = lan.utils.createIframe();
       expect(frame.tagName).toBe("IFRAME");
     });
 
     it("should return an iframe that is not in the DOM", function(){
-      var frame = lan.utils.create_iframe();
+      var frame = lan.utils.createIframe();
       expect(frame.parentNode).toBeFalsy(); 
     });
 
@@ -55,7 +55,7 @@ describe("lan.utils", function() {
       });
 
       it("should return an iframe that has been inserted into the DOM", function(){
-        frame = lan.utils.create_iframe({insert: true});
+        frame = lan.utils.createIframe({insert: true});
         expect(frame.parentNode).toBeTruthy(); 
       });
     });
@@ -64,7 +64,7 @@ describe("lan.utils", function() {
       var data_url = 'data:text/html,<html><body>HELLO</body></html>';
 
       it("should return an iframe with a data URL in its src", function() {
-        var frame = lan.utils.create_iframe({url: data_url});
+        var frame = lan.utils.createIframe({url: data_url});
         expect(frame.getAttribute('src')).toMatch(/data/);
       });
     });

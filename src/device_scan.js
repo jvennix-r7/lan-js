@@ -82,7 +82,7 @@ var CSSProbe = function(opts) {
   var _frame    = null;
 
   // initialization
-  _frame = lan.utils.create_iframe();
+  _frame = lan.utils.createIframe();
   _frame.contentDocument.write('<html>'+opts.html+'</html>');
   document.body.appendChild(_frame);
 
@@ -143,7 +143,7 @@ CSSProbe.POLL_INTERVAL = 10;
 var JSProbe = function(opts) {
   var _frame = null;
   var _this  = this;
-  _frame = lan.utils.create_iframe();
+  _frame = lan.utils.createIframe();
 
   /*
    * Requests the script in an <iframe>, then checks expected styles

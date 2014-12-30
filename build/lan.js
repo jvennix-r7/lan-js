@@ -27,7 +27,7 @@ var constants = {
  * @option opts [String] url the url to point the iframe to. defaults to about:blank.
  * @option opts [Boolean] insert insert into DOM. defaults to false.
  */
-var create_iframe = function(opts) {
+var createIframe = function(opts) {
   opts = opts || {};
   var url = opts.url || 'about:blank';
   var iframe = document.createElement('iframe');
@@ -42,7 +42,7 @@ var create_iframe = function(opts) {
  */
 this.lan = this.lan || {};
 this.lan.utils = {
-  create_iframe: create_iframe,
+  createIframe: createIframe,
   constants: constants,
   merge: merge,
   each: each
@@ -383,7 +383,7 @@ var CSSProbe = function(opts) {
   var _frame    = null;
 
   // initialization
-  _frame = lan.utils.create_iframe();
+  _frame = lan.utils.createIframe();
   _frame.contentDocument.write('<html>'+opts.html+'</html>');
   document.body.appendChild(_frame);
 
@@ -444,7 +444,7 @@ CSSProbe.POLL_INTERVAL = 10;
 var JSProbe = function(opts) {
   var _frame = null;
   var _this  = this;
-  _frame = lan.utils.create_iframe();
+  _frame = lan.utils.createIframe();
 
   /*
    * Requests the script in an <iframe>, then checks expected styles
