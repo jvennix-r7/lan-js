@@ -233,15 +233,6 @@ DeviceFingerprint.PROBES = {
   js:    JSProbe
 };
 
-DeviceFingerprint.db = [];
-if (lan.db && lan.db.devices) {
-  lan.utils.each(lan.db.devices, function(device) {
-    lan.utils.each(device.fingerprints, function(fingerprint) {
-      DeviceFingerprint.db.push(new DeviceFingerprint(fingerprint.type, device, fingerprint));
-    });
-  });
-}
-
 /*
  * DeviceScan constructor
  * @param [Array<String>] addresses IPs to scan
@@ -257,6 +248,7 @@ var DeviceScan = function(addresses) {
    * - Everytime a device is found, the :found callback is invoked
    * - At the end of the scan, the :complete callback is invoked
    * @param [Object] opts the options object
+   * @option opts [Array<Object>] devices a set of devices and HTTP fingerprints to attempt (see db.js)
    * @option opts [Function(address, device)] found called when a device is successfully fingerprinted
    * @option opts [Function(address, device)] failed called when a device fails a fingerprint
    * @option opts [Function(address, state, deltat)] hostup called when a host is discovered up
@@ -265,6 +257,15 @@ var DeviceScan = function(addresses) {
    */
   this.start = function(opts) {
     opts = opts || {};
+
+    var devices = opts.devices || (lan.db && lan.db.devices) || [];
+    var fingerprintDatabase = [];
+    lan.utils.each(devices, function(device) {
+      lan.utils.each(device.fingerprints, function(fingerprint) {
+        fingerprintDatabase.push(new DeviceFingerprint(fingerprint.type, device, fingerprint));
+      });
+    });
+
     var scan = new lan.HostScan(addresses);
     scan.start({
       stream: function(address, state, deltat) {
@@ -273,7 +274,7 @@ var DeviceScan = function(addresses) {
             opts.hostup(address, state, deltat);
           }
           // try every probe in the database
-          lan.utils.each(DeviceFingerprint.db, function(fingerprint, i) {
+          lan.utils.each(fingerprintDatabase, function(fingerprint, i) {
             fingerprint.check({base: 'http://'+address }, function(probeState) {
               if (probeState && opts.found) {
                 opts.found(address, fingerprint);

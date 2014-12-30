@@ -88,11 +88,11 @@ lan.utils.each(WS_BLOCKED_PORTS, function(v, k) {
 });
 
 /*
- * TcpProbe constructor function
+ * HostProbe constructor function
  * @param [String] address the host:port to scan
  */
-var TcpProbe = function(address) {
-  if (!address) throw "TcpProbe needs an address param.";
+var HostProbe = function(address) {
+  if (!address) throw "HostProbe needs an address param.";
 
   /*
    * sends the TCP request
@@ -136,7 +136,7 @@ var TcpProbe = function(address) {
     var check_socket = function() {
       var delta = (new Date()) - start_time;
       // check if the port has timed out
-      if (delta > TcpProbe.TIMEOUT) {
+      if (delta > HostProbe.TIMEOUT) {
         if (callback) callback('timeout', delta);
         return;
       } else if (socket.readyState !== 0) {
@@ -174,7 +174,7 @@ var TcpProbe = function(address) {
     };
 
     // if the request takes to long, report 'timeout' state
-    clearme = setTimeout(check_timeout, TcpProbe.TIMEOUT);
+    clearme = setTimeout(check_timeout, HostProbe.TIMEOUT);
     // trigger the request
     img.onload = img.onerror = completed; // TODO: ensure this works in IE.
     img.src = window.location.protocol + '//' + address;
@@ -182,9 +182,9 @@ var TcpProbe = function(address) {
 };
 
 /*
- * TcpProbe static constants
+ * HostProbe static constants
  */
-TcpProbe.TIMEOUT = 2000; // 2s
+HostProbe.TIMEOUT = 2000; // 2s
 
 /*
  * HostScan constructor function
@@ -213,7 +213,7 @@ var HostScan = function(addresses) {
       var addr = addresses[addr_idx];
       var bidx = batch_idx; // local closure
       setTimeout(function() {
-        var probe = new TcpProbe(addr);
+        var probe = new HostProbe(addr);
         probe.fire(function(state, duration) {
           if (opts.stream) opts.stream(addr, state, duration);
           responses.push({ address: addr, state: state, duration: duration });
@@ -242,7 +242,7 @@ var HostScan = function(addresses) {
  */
 
 /*
- * @param [Array<String>] addresses IPs/hostnames (no ports!) to scan
+ * @param [Array<String>] addresses IPs/hostnames to scan
  * @param [Object] opts the options hash
  * @option opts [Function(resultsObject)] complete the complete callback (called once at end)
  * @option opts [Function(singleResult)] stream the update callback (called on every check)
@@ -252,7 +252,7 @@ HostScan.start = function(addresses, opts) {
 };
 
 // // DEBUG CODE: how to invoke the HostScan class
-// new HostScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
+// new lan.HostScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
 //   complete: function(responses, duration) {
 //     console.log('complete callback: '+duration);
 //     var results = {};
@@ -273,7 +273,7 @@ HostScan.start = function(addresses, opts) {
 //   var addrs = []; // holds ip:port strings
 //   while (start <= end) addrs.push(ip+':'+start++);
 
-//   new HostScan(addrs).start({
+//   new lan.HostScan(addrs).start({
 //     complete: function(responses, duration) {
 //       console.log('complete callback: '+duration);
 //       var results = {};
@@ -293,7 +293,7 @@ HostScan.start = function(addresses, opts) {
 // exports
 lan.utils.merge(lan, {
   HostScan: HostScan,
-  HostProbe: TcpProbe
+  HostProbe: HostProbe
 });
 
 }).call(window);
@@ -533,15 +533,6 @@ DeviceFingerprint.PROBES = {
   js:    JSProbe
 };
 
-DeviceFingerprint.db = [];
-if (lan.db && lan.db.devices) {
-  lan.utils.each(lan.db.devices, function(device) {
-    lan.utils.each(device.fingerprints, function(fingerprint) {
-      DeviceFingerprint.db.push(new DeviceFingerprint(fingerprint.type, device, fingerprint));
-    });
-  });
-}
-
 /*
  * DeviceScan constructor
  * @param [Array<String>] addresses IPs to scan
@@ -557,6 +548,7 @@ var DeviceScan = function(addresses) {
    * - Everytime a device is found, the :found callback is invoked
    * - At the end of the scan, the :complete callback is invoked
    * @param [Object] opts the options object
+   * @option opts [Array<Object>] devices a set of devices and HTTP fingerprints to attempt (see db.js)
    * @option opts [Function(address, device)] found called when a device is successfully fingerprinted
    * @option opts [Function(address, device)] failed called when a device fails a fingerprint
    * @option opts [Function(address, state, deltat)] hostup called when a host is discovered up
@@ -565,6 +557,15 @@ var DeviceScan = function(addresses) {
    */
   this.start = function(opts) {
     opts = opts || {};
+
+    var devices = opts.devices || (lan.db && lan.db.devices) || [];
+    var fingerprintDatabase = [];
+    lan.utils.each(devices, function(device) {
+      lan.utils.each(device.fingerprints, function(fingerprint) {
+        fingerprintDatabase.push(new DeviceFingerprint(fingerprint.type, device, fingerprint));
+      });
+    });
+
     var scan = new lan.HostScan(addresses);
     scan.start({
       stream: function(address, state, deltat) {
@@ -573,7 +574,7 @@ var DeviceScan = function(addresses) {
             opts.hostup(address, state, deltat);
           }
           // try every probe in the database
-          lan.utils.each(DeviceFingerprint.db, function(fingerprint, i) {
+          lan.utils.each(fingerprintDatabase, function(fingerprint, i) {
             fingerprint.check({base: 'http://'+address }, function(probeState) {
               if (probeState && opts.found) {
                 opts.found(address, fingerprint);

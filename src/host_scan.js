@@ -37,11 +37,11 @@ lan.utils.each(WS_BLOCKED_PORTS, function(v, k) {
 });
 
 /*
- * TcpProbe constructor function
+ * HostProbe constructor function
  * @param [String] address the host:port to scan
  */
-var TcpProbe = function(address) {
-  if (!address) throw "TcpProbe needs an address param.";
+var HostProbe = function(address) {
+  if (!address) throw "HostProbe needs an address param.";
 
   /*
    * sends the TCP request
@@ -85,7 +85,7 @@ var TcpProbe = function(address) {
     var check_socket = function() {
       var delta = (new Date()) - start_time;
       // check if the port has timed out
-      if (delta > TcpProbe.TIMEOUT) {
+      if (delta > HostProbe.TIMEOUT) {
         if (callback) callback('timeout', delta);
         return;
       } else if (socket.readyState !== 0) {
@@ -123,7 +123,7 @@ var TcpProbe = function(address) {
     };
 
     // if the request takes to long, report 'timeout' state
-    clearme = setTimeout(check_timeout, TcpProbe.TIMEOUT);
+    clearme = setTimeout(check_timeout, HostProbe.TIMEOUT);
     // trigger the request
     img.onload = img.onerror = completed; // TODO: ensure this works in IE.
     img.src = window.location.protocol + '//' + address;
@@ -131,9 +131,9 @@ var TcpProbe = function(address) {
 };
 
 /*
- * TcpProbe static constants
+ * HostProbe static constants
  */
-TcpProbe.TIMEOUT = 2000; // 2s
+HostProbe.TIMEOUT = 2000; // 2s
 
 /*
  * HostScan constructor function
@@ -162,7 +162,7 @@ var HostScan = function(addresses) {
       var addr = addresses[addr_idx];
       var bidx = batch_idx; // local closure
       setTimeout(function() {
-        var probe = new TcpProbe(addr);
+        var probe = new HostProbe(addr);
         probe.fire(function(state, duration) {
           if (opts.stream) opts.stream(addr, state, duration);
           responses.push({ address: addr, state: state, duration: duration });
@@ -191,7 +191,7 @@ var HostScan = function(addresses) {
  */
 
 /*
- * @param [Array<String>] addresses IPs/hostnames (no ports!) to scan
+ * @param [Array<String>] addresses IPs/hostnames to scan
  * @param [Object] opts the options hash
  * @option opts [Function(resultsObject)] complete the complete callback (called once at end)
  * @option opts [Function(singleResult)] stream the update callback (called on every check)
@@ -201,7 +201,7 @@ HostScan.start = function(addresses, opts) {
 };
 
 // // DEBUG CODE: how to invoke the HostScan class
-// new HostScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
+// new lan.HostScan(['192.168.1.1:80', '192.168.1.1:8080']).start({
 //   complete: function(responses, duration) {
 //     console.log('complete callback: '+duration);
 //     var results = {};
@@ -222,7 +222,7 @@ HostScan.start = function(addresses, opts) {
 //   var addrs = []; // holds ip:port strings
 //   while (start <= end) addrs.push(ip+':'+start++);
 
-//   new HostScan(addrs).start({
+//   new lan.HostScan(addrs).start({
 //     complete: function(responses, duration) {
 //       console.log('complete callback: '+duration);
 //       var results = {};
@@ -242,7 +242,7 @@ HostScan.start = function(addresses, opts) {
 // exports
 lan.utils.merge(lan, {
   HostScan: HostScan,
-  HostProbe: TcpProbe
+  HostProbe: HostProbe
 });
 
 }).call(window);
