@@ -87,6 +87,7 @@ var HostProbe = function(address) {
       var delta = (new Date()) - startTime;
       // check if the port has timed out
       if (delta > HostProbe.TIMEOUT) {
+        try { socket.close(); } catch(e) {}
         if (callback) callback('timeout', delta);
         return;
       } else if (socket.readyState !== 0) {
@@ -116,7 +117,7 @@ var HostProbe = function(address) {
       }
     };
 
-    var check_timeout = function() {
+    var checkTimeout = function() {
       if (img) {
         img = null;
         if (callback) callback('timeout', delta());
@@ -124,7 +125,7 @@ var HostProbe = function(address) {
     };
 
     // if the request takes to long, report 'timeout' state
-    clearme = setTimeout(check_timeout, HostProbe.TIMEOUT);
+    clearme = setTimeout(checkTimeout, HostProbe.TIMEOUT);
     // trigger the request
     img.onload = img.onerror = completed; // TODO: ensure this works in IE.
     img.src = window.location.protocol + '//' + address;
@@ -139,11 +140,17 @@ HostProbe.TIMEOUT = 2000; // 2s
 /*
  * HostScan constructor function
  * @param [Array<String>, String] addresses the host:port(s) to scan
+ * @param [Object] opts the options hash
+ * @option opts [Number] batchSize the number of requests per batch, defaults to 10
+ * @option opts [Number] batchDelay the delay between batches, defaults to 1500
  */
-var HostScan = function(addresses) {
+var HostScan = function(addresses, opts) {
   if (!addresses) throw "HostScan requests addresses param.";
   if (addresses.constructor != Array) addresses = [addresses];
+  opts = opts || {};
   var responses = []; // used to build responses parameter for 'complete' callback to #start
+  var batchSize = opts.batchSize || BATCH_SIZE;
+  var batchDelay = opts.batchDelay || BATCH_DELAY;
 
   // starts sending requests to the addresses in #addresses
   // @param [Object] opts the options hash
@@ -158,9 +165,10 @@ var HostScan = function(addresses) {
 
     // sends the probes
     var sendProbe = function(i) { 
-      var addrIdx = batchIdx * BATCH_SIZE + i;
+      var addrIdx = batchIdx * batchSize + i;
       if (addrIdx >= addresses.length) return;
       var addr = addresses[addrIdx];
+
       var bidx = batchIdx; // local closure
       setTimeout(function() {
         var probe = new HostProbe(addr);
@@ -174,12 +182,12 @@ var HostScan = function(addresses) {
             }
           }
         });
-      }, bidx * BATCH_DELAY);
+      }, bidx * batchDelay);
     };
 
     // run the loop
-    while (batchIdx * BATCH_SIZE < addresses.length) {
-      for (var k = 0; k < BATCH_SIZE; k++) {
+    while (batchIdx * batchSize < addresses.length) {
+      for (var k = 0; k < batchSize; k++) {
         sendProbe(k);
       }
       batchIdx++;

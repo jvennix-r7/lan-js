@@ -18,6 +18,18 @@ this.lan.db = this.lan.db || {};
 
 this.lan.db.devices = [
   {
+    make: "Cisco",
+    model: "Switch",
+    fingerprints: [
+      {
+        type: "image",
+        url: "/images/cisco_logo_header.png",
+        width: 62,
+        height: 33
+      }
+    ]
+  },
+  {
     make: "2Wire",
     model: "1000 Series",
     fingerprints:[

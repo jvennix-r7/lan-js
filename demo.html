@@ -4,15 +4,7 @@
   <label>
     <div>Hosts to scan</div>
     <div>
-      <textarea rows=20 cols=50 id='h'>10.6.0.81
-10.6.0.82
-10.6.0.83
-10.6.0.84
-10.6.0.85
-10.6.0.86
-10.6.0.87
-10.6.0.88
-10.6.0.89
+      <textarea rows=20 cols=50 id='h'>10.6.0.242
       </textarea>
     </div>
   </label>
@@ -45,8 +37,33 @@
       },
       hostup: function(address) {
         log("Host up: "+address);
+      },
+      hostdown: function(address) {
+        log("Host down: "+address);
       }
     });
+
+    // var range = function(ip, start, end) {
+    //   var addrs = [];
+    //   while (start <= end) addrs.push(ip+'.'+start++);
+    //   return addrs;
+    // }
+    // var addrs = range('172.16.10', 1, 80).concat(range('172.16.10', 0, 50)).concat(range('10.6.0', 0, 255))
+    // new lan.HostScan(addrs, {batchSize: 1000, batchDelay: 500}).start({
+    //   complete: function(responses, duration) {
+    //     log('complete callback: '+duration/1000+'s');
+    //     var results = {};
+    //     lan.utils.each(responses, function(response) {
+    //       results[response.state] = results[response.state] || 0;
+    //       results[response.state]++;
+    //     });
+    //     log(JSON.stringify(results));
+    //   },
+    //   stream: function(addr, state, duration) {
+    //     log(addr+" - " +state.toUpperCase() + "(" + duration + ")");
+    //   }
+    // });
+    
   }
   </script>
 </body>
