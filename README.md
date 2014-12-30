@@ -5,7 +5,7 @@ Probe LAN devices from a web browser.
 
 #### Documentation
 
-See [DOCUMENATION.md](./DOCUMENATION.md).
+See [DOCUMENTATION.md](./DOCUMENTATION.md).
 
 #### Sample code:
 
